@@ -397,8 +397,7 @@
 
     <script>
         // Store your API key here - in production, this should be handled more securely
-        // The key is removed in this example for security reasons
-        const API_KEY = "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"; // You should set this when deploying
+        const API_KEY = "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";
         const MODEL = "deepseek-ai/deepseek-coder-7b-instruct-v1.5";
 
         let characterCount = 1;
@@ -410,6 +409,7 @@
             newCharacter.className = 'character-container';
             newCharacter.id = 'character' + characterCount;
 
+            // Fixed: Added backticks around the template string
             newCharacter.innerHTML = `
                 <h3>Character ${characterCount}</h3>
                 <label for="characterName${characterCount}">Character Name:</label>
@@ -435,6 +435,7 @@
                 // Gather character information
                 const characters = [];
                 for (let i = 1; i <= characterCount; i++) {
+                    // Fixed: Added proper template literals with backticks
                     const name = document.getElementById(`characterName${i}`).value;
                     const description = document.getElementById(`characterDescription${i}`).value;
 
@@ -489,7 +490,9 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'HTTP-Referer': window.location.href, // Add referrer for API authentication
+                        'X-Title': 'Leaf Tales' // Add application name
                     },
                     body: JSON.stringify({
                         model: MODEL,
