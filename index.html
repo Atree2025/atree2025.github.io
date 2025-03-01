@@ -400,6 +400,10 @@
         const API_KEY = "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";
         const MODEL = "deepseek-ai/deepseek-coder-7b-instruct-v1.5";
 
+        // Define a default site URL and site name
+        const SITE_URL = "https://atree2025.github.io/";
+        const SITE_NAME = "Leaf Tales Story Generator";
+
         let characterCount = 1;
 
         document.getElementById('addCharacterBtn').addEventListener('click', function() {
@@ -409,7 +413,6 @@
             newCharacter.className = 'character-container';
             newCharacter.id = 'character' + characterCount;
 
-            // Fixed: Added backticks around the template string
             newCharacter.innerHTML = `
                 <h3>Character ${characterCount}</h3>
                 <label for="characterName${characterCount}">Character Name:</label>
@@ -435,7 +438,6 @@
                 // Gather character information
                 const characters = [];
                 for (let i = 1; i <= characterCount; i++) {
-                    // Fixed: Added proper template literals with backticks
                     const name = document.getElementById(`characterName${i}`).value;
                     const description = document.getElementById(`characterDescription${i}`).value;
 
@@ -485,14 +487,16 @@
                     throw new Error("API key is missing. Please set your OpenRouter API key in the script.");
                 }
 
-                // Call the API
+                console.log("Sending request to OpenRouter API...");
+
+                // Call the API with proper OpenRouter headers
                 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${API_KEY}`,
-                        'HTTP-Referer': window.location.href, // Add referrer for API authentication
-                        'X-Title': 'Leaf Tales' // Add application name
+                        'HTTP-Referer': SITE_URL,
+                        'X-Title': SITE_NAME
                     },
                     body: JSON.stringify({
                         model: MODEL,
@@ -506,11 +510,14 @@
                     })
                 });
 
-                const data = await response.json();
-
                 if (!response.ok) {
-                    throw new Error(data.error?.message || "Error generating story");
+                    const errorData = await response.json();
+                    console.error("API Error:", errorData);
+                    throw new Error(errorData.error?.message || `Error: ${response.status} ${response.statusText}`);
                 }
+
+                const data = await response.json();
+                console.log("API Response:", data);
 
                 // Display the generated story
                 const generatedStory = data.choices[0].message.content;
