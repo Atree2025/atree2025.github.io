@@ -396,9 +396,7 @@
     </footer>
 
     <script>
-        // Store your API key here - in production, this should be handled more securely
-        // The key is removed in this example for security reasons
-        const API_KEY = "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"; // You should set this when deploying
+        // Access API key from environment variable instead of hardcoding it
         const MODEL = "deepseek-ai/deepseek-coder-7b-instruct-v1.5";
 
         let characterCount = 1;
@@ -480,8 +478,11 @@
                         break;
                 }
 
+                // Get the API key from the environment variable
+                const API_KEY = process.env.API;
+
                 if (!API_KEY) {
-                    throw new Error("API key is missing. Please set your OpenRouter API key in the script.");
+                    throw new Error("API key is missing. Please make sure the API environment variable is set.");
                 }
 
                 // Call the API
