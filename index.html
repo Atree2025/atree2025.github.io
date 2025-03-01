@@ -15,14 +15,14 @@
             --glass-border: rgba(255, 255, 255, 0.1);
             --glass-shadow: rgba(0, 0, 0, 0.2);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background-color: var(--dark-bg);
             color: var(--text-primary);
@@ -34,7 +34,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         /* Background animation */
         .background-animation {
             position: fixed;
@@ -45,7 +45,7 @@
             z-index: -1;
             opacity: 0.6;
         }
-        
+
         .floating-circle {
             position: absolute;
             border-radius: 50%;
@@ -53,7 +53,7 @@
             opacity: 0.2;
             animation: float 20s infinite linear;
         }
-        
+
         @keyframes float {
             0% {
                 transform: translate(0, 0) scale(1);
@@ -78,7 +78,7 @@
             70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
             100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
         }
-        
+
         .container {
             width: 90%;
             max-width: 800px;
@@ -86,12 +86,12 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .logo {
             margin-bottom: 2rem;
             position: relative;
         }
-        
+
         .logo svg {
             fill: var(--green-accent);
             width: 120px;
@@ -99,7 +99,7 @@
             filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.4));
             transition: transform 0.3s ease, filter 0.3s ease;
         }
-        
+
         .logo svg:hover {
             transform: scale(1.05) rotate(5deg);
             filter: drop-shadow(0 0 12px rgba(74, 222, 128, 0.6));
@@ -117,7 +117,7 @@
             border-radius: 50%;
             filter: blur(5px);
         }
-        
+
         .search-container {
             background-color: var(--dark-secondary);
             border-radius: 16px;
@@ -128,18 +128,18 @@
             border: 1px solid var(--glass-border);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .search-container:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
         }
-        
+
         .search-form {
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
-        
+
         .search-box {
             display: flex;
             align-items: center;
@@ -150,12 +150,12 @@
             transition: box-shadow 0.3s ease;
             background-color: rgba(18, 18, 18, 0.7);
         }
-        
+
         .search-box:focus-within {
             box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
             animation: subtle-pulse 2s infinite;
         }
-        
+
         .search-input {
             flex: 1;
             padding: 14px 18px;
@@ -166,7 +166,7 @@
             font-size: 1rem;
             transition: background-color 0.3s ease;
         }
-        
+
         /* Reddit toggle integrated into search bar */
         .reddit-toggle-container {
             display: flex;
@@ -174,27 +174,27 @@
             padding: 0 10px;
             gap: 6px;
         }
-        
+
         .toggle-label {
             color: var(--text-secondary);
             font-size: 0.85rem;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
             white-space: nowrap;
         }
-        
+
         .toggle {
             position: relative;
             display: inline-block;
             width: 36px;
             height: 20px;
         }
-        
+
         .toggle input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -208,7 +208,7 @@
             backdrop-filter: blur(5px);
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
+
         .slider:before {
             position: absolute;
             content: "";
@@ -221,11 +221,11 @@
             border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
+
         input:checked + .slider {
             background-color: var(--green-accent);
         }
-        
+
         input:checked + .slider:before {
             transform: translateX(16px);
             background-color: #121212;
@@ -238,7 +238,7 @@
             background-color: var(--glass-border);
             margin: 0 5px;
         }
-        
+
         .search-button {
             background-color: var(--green-accent);
             color: #000;
@@ -252,7 +252,7 @@
             overflow: hidden;
             height: 48px;
         }
-        
+
         .search-button:hover {
             background-color: var(--green-accent-dark);
             letter-spacing: 1px;
@@ -272,7 +272,7 @@
         .search-button:hover::before {
             left: 100%;
         }
-        
+
         .footer {
             margin-top: 2rem;
             color: var(--text-secondary);
@@ -285,30 +285,30 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
-        
+
         .footer:hover {
             background: rgba(30, 30, 30, 0.5);
             transform: translateY(-3px);
         }
-        
+
         .footer a {
             color: var(--green-accent);
             text-decoration: none;
             transition: color 0.2s;
         }
-        
+
         .footer a:hover {
             color: var(--green-accent-dark);
             text-decoration: underline;
         }
-        
+
         .bookmarks {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
             margin-top: 2.5rem;
         }
-        
+
         .bookmark {
             background-color: var(--dark-secondary);
             border-radius: 16px;
@@ -322,7 +322,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .bookmark:hover {
             transform: translateY(-8px) scale(1.03);
             background-color: rgba(42, 42, 42, 0.7);
@@ -347,7 +347,7 @@
             opacity: 1;
             transform: scale(1);
         }
-        
+
         .bookmark-icon {
             width: 50px;
             height: 50px;
@@ -363,12 +363,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border: 1px solid var(--glass-border);
         }
-        
+
         .bookmark:hover .bookmark-icon {
             transform: translateY(-5px) scale(1.1);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
-        
+
         .bookmark-icon svg {
             width: 28px;
             height: 28px;
@@ -376,12 +376,12 @@
             transition: all 0.3s ease;
             filter: drop-shadow(0 0 5px rgba(74, 222, 128, 0.3));
         }
-        
+
         .bookmark:hover .bookmark-icon svg {
             fill: rgba(74, 222, 128, 1);
             filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.5));
         }
-        
+
         .bookmark-title {
             color: var(--text-primary);
             font-size: 0.95rem;
@@ -391,37 +391,37 @@
             transition: all 0.3s ease;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
-        
+
         .bookmark:hover .bookmark-title {
             transform: scale(1.05);
             letter-spacing: 0.5px;
         }
-        
+
         @media (max-width: 768px) {
             .bookmarks {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
+
             .reddit-toggle-container {
                 padding: 5px 10px;
             }
-            
+
             .search-box {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .search-divider {
                 width: 100%;
                 height: 1px;
                 margin: 5px 0;
             }
-            
+
             .search-button {
                 height: 40px;
             }
         }
-        
+
         @media (max-width: 480px) {
             .bookmarks {
                 grid-template-columns: repeat(2, 1fr);
@@ -432,7 +432,7 @@
 <body>
     <!-- Background animation container -->
     <div class="background-animation" id="background-animation"></div>
-    
+
     <div class="container">
         <div class="logo">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -441,14 +441,14 @@
                 <circle cx="12" cy="12" r="2"/>
             </svg>
         </div>
-        
+
         <div class="search-container">
             <form id="search-form" class="search-form" action="https://duckduckgo.com/" method="get">
                 <div class="search-box">
                     <input type="text" id="search-input" name="q" class="search-input" placeholder="Search with DuckDuckGo..." autocomplete="off" autofocus>
-                    
+
                     <div class="search-divider"></div>
-                    
+
                     <div class="reddit-toggle-container">
                         <span class="toggle-label">Reddit</span>
                         <label class="toggle">
@@ -456,12 +456,12 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    
+
                     <button type="submit" class="search-button">Search</button>
                 </div>
             </form>
         </div>
-        
+
         <div class="bookmarks">
             <div class="bookmark">
                 <div class="bookmark-icon">
@@ -496,7 +496,7 @@
                 <div class="bookmark-title">Kleinanzeigen</div>
             </div>
         </div>
-        
+
         <div class="footer">
             <p>Current time: <span id="current-time"></span></p>
         </div>
@@ -509,7 +509,7 @@
             const now = new Date();
             timeElement.textContent = now.toLocaleTimeString();
         }
-        
+
         setInterval(updateTime, 1000);
         updateTime();
 
@@ -517,21 +517,21 @@
         const searchForm = document.getElementById('search-form');
         const searchInput = document.getElementById('search-input');
         const redditToggle = document.getElementById('reddit-toggle');
-        
+
         searchForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             let searchQuery = searchInput.value.trim();
-            
+
             if (redditToggle.checked) {
                 if (!searchQuery.includes('site:reddit.com')) {
                     searchQuery = `${searchQuery} site:reddit.com`;
                 }
             }
-            
+
             window.location.href = `https://duckduckgo.com/?q=${encodeURIComponent(searchQuery)}`;
         });
-        
+
         // Make bookmarks clickable
         const bookmarks = document.querySelectorAll('.bookmark');
         const bookmarkUrls = [
@@ -540,7 +540,7 @@
             'https://claude.ai',
             'https://www.kleinanzeigen.de'
         ];
-        
+
         bookmarks.forEach((bookmark, index) => {
             bookmark.addEventListener('click', () => {
                 if (index < bookmarkUrls.length) {
@@ -548,52 +548,63 @@
                 }
             });
         });
-        
+
         // Create background animation
         function createBackgroundAnimation() {
             const container = document.getElementById('background-animation');
             const numCircles = 7; // Adding more circles for a richer background
-            
+
             for (let i = 0; i < numCircles; i++) {
                 const circle = document.createElement('div');
                 circle.classList.add('floating-circle');
-                
+
                 // Randomize size
                 const size = Math.random() * 400 + 150;
                 circle.style.width = `${size}px`;
                 circle.style.height = `${size}px`;
-                
+
                 // Randomize position
                 const posX = Math.random() * 100;
                 const posY = Math.random() * 100;
                 circle.style.left = `${posX}%`;
                 circle.style.top = `${posY}%`;
-                
+
                 // Randomize animation
                 const delay = Math.random() * 10;
                 const duration = 15 + Math.random() * 25;
                 circle.style.animationDelay = `${delay}s`;
                 circle.style.animationDuration = `${duration}s`;
-                
+
                 container.appendChild(circle);
             }
         }
-        
+
         createBackgroundAnimation();
-        
+
         // Add hover effect for search container
         const searchContainer = document.querySelector('.search-container');
-        
+
         searchContainer.addEventListener('mousemove', function(e) {
             const rect = this.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            
+
             this.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(40, 40, 40, 0.7), rgba(30, 30, 30, 0.7) 40%)`;
         });
-        
+
         searchContainer.addEventListener('mouseleave', function() {
             this.style.background = 'var(--dark-secondary)';
+        });
+
+        // Add automatic text field selection when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+
+            // Focus on the input field
+            searchInput.focus();
+
+            // Select any text in the field (if there's any)
+            searchInput.select();
         });
     </script>
 </body>
