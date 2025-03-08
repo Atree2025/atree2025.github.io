@@ -3,534 +3,699 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaf Tales | AI Story Generator</title>
+    <title>3D Audio Rotator with Visualizer</title>
     <style>
         :root {
-            --primary-color: #4a7c59;
-            --secondary-color: #90be6d;
-            --accent-color: #f8bd7f;
-            --background-color: #f4f9f4;
-            --text-color: #2c3e50;
-            --card-color: #ffffff;
-            --error-color: #e76f51;
+            --bg-color: #f4f4f4;
+            --text-color: #333;
+            --control-bg: #fff;
+            --control-border: #ddd;
+            --control-focus: #007bff;
+            --btn-bg: #007bff;
+            --btn-hover: #0056b3;
+            --canvas-bg: #fafafa;
+            --canvas-border: #ccc;
+            --helper-line-color: #999;
+        }
+
+        .dark-mode {
+            --bg-color: #121212;
+            --text-color: #eee;
+            --control-bg: #222;
+            --control-border: #444;
+            --control-focus: #4da6ff;
+            --btn-bg: #4da6ff;
+            --btn-hover: #367ab3;
+            --canvas-bg: #1e1e1e;
+            --canvas-border: #555;
+            --helper-line-color: #777;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--background-color);
+            background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        h1 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 700;
-            font-size: 2.5rem;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 10px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column; /* Stack controls and visualizer */
+            align-items: center;
+            min-height: 100vh;
         }
 
         .container {
-            background-color: var(--card-color);
-            padding: 30px;
+            background-color: var(--control-bg);
             border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 80%;
+            max-width: 800px;
+            margin-bottom: 20px; /* Space between controls and visualizer */
         }
 
-        .container::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-color); /* Use variable */
         }
 
-        .leaf-decoration {
-            position: absolute;
-            opacity: 0.06;
-            z-index: 0;
-        }
-
-        .leaf-top-right {
-            top: -40px;
-            right: -40px;
-            transform: rotate(45deg);
-            font-size: 120px;
-        }
-
-        .leaf-bottom-left {
-            bottom: -40px;
-            left: -40px;
-            transform: rotate(-45deg);
-            font-size: 100px;
+        .control-group {
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-top: 15px;
+            margin-bottom: 8px;
+            color: var(--text-color); /* Use variable */
             font-weight: 600;
-            color: var(--primary-color);
         }
 
-        input, textarea, select {
+        input[type="file"],
+        input[type="range"],
+        select,
+        .btn {
             width: 100%;
             padding: 12px;
-            margin-top: 8px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            border: 1px solid var(--control-border);
+            border-radius: 6px;
+            font-size: 16px;
             box-sizing: border-box;
-            transition: all 0.3s;
-            background-color: #fafafa;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: var(--control-bg);
+            color: var(--text-color);
         }
 
-        input:focus, textarea:focus, select:focus {
+        input[type="range"] {
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--control-border);
             outline: none;
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 2px rgba(144, 190, 109, 0.2);
+            height: 8px;
         }
 
-        textarea {
-            height: 100px;
-            resize: vertical;
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--btn-bg);
+            cursor: pointer;
         }
 
-        button {
-            background-color: var(--primary-color);
+        input[type="file"]:focus,
+        input[type="range"]:focus,
+        select:focus,
+        .btn:focus {
+            border-color: var(--control-focus);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--btn-bg);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        #customCanvas,
+        #heightCanvas {
+            border: 1px solid var(--canvas-border);
+            background-color: var(--canvas-bg);
+            display: none;
+            margin-top: 10px;
+            touch-action: none;
+            width: 200px; /* Square dimensions */
+            height: 200px;
+            box-sizing: border-box;
+        }
+
+        #customCanvasWrap,
+        #heightCanvasWrap {
+           display: inline-block; /* Key change for side-by-side layout */
+            position: relative;
+            width: 200px; /* Match canvas */
+            height: 200px;
+            margin-top: 10px;
+            margin-right: 10px; /* Add some spacing between canvases */
+        }
+
+        #instructions {
+            font-size: 0.9em;
+            color: var(--text-color);
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        #customControls {
+            margin-top: 20px;
+            text-align: center; /* Center the content */
+        }
+        .canvas-container {
+           display: flex; /* Use flexbox for horizontal layout */
+           justify-content: center; /* Center canvases horizontally */
+            width: 100%;
+            margin-bottom: 10px; /* Add margin below the canvases */
+         }
+
+         /* Style for the visualizer canvas */
+         #visualizerCanvas {
+            width: 100%;  /* Full Width */
+            max-width: 800px; /* But not exceeding the container */
+            aspect-ratio: 2 / 1; /* Maintain 2:1 aspect ratio */
+            border: 1px solid var(--canvas-border);
+            background-color: var(--canvas-bg);
+            box-sizing: border-box;
+        }
+        #visualizerCanvasWrap {
+            display: flex;
+            justify-content: center;
+            width: 100%
+        }
+        /* Dark Mode Toggle */
+        #darkModeToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            /* Style the toggle (you can use a more fancy toggle if you like) */
+            padding: 5px 10px;
+            background-color: var(--btn-bg);
             color: white;
             border: none;
-            padding: 12px 24px;
-            margin-top: 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        button:hover {
-            background-color: #3d6a4b;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .loading {
-            text-align: center;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            margin: 10px auto;
-            border: 4px solid rgba(74, 124, 89, 0.2);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s infinite linear;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .result {
-            margin-top: 30px;
-            background-color: #f9f9f9;
-            padding: 25px;
-            border-radius: 10px;
-            white-space: pre-wrap;
-            display: none;
-            border-left: 5px solid var(--accent-color);
-            position: relative;
-            font-family: Georgia, serif;
-            line-height: 1.8;
-        }
-
-        .result::before {
-            content: """;
-            font-size: 60px;
-            color: rgba(74, 124, 89, 0.1);
-            position: absolute;
-            top: -10px;
-            left: 10px;
-        }
-
-        .character-container {
-            background-color: rgba(144, 190, 109, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            position: relative;
-            border-left: 4px solid var(--secondary-color);
-        }
-
-        .character-container h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-        }
-
-        .character-container h3::before {
-            content: "🧑";
-            margin-right: 8px;
-            font-size: 1.2em;
-        }
-
-        .add-character {
-            background-color: var(--secondary-color);
-            margin-bottom: 20px;
-        }
-
-        .add-character:hover {
-            background-color: #7da95e;
-        }
-
-        .error {
-            color: var(--error-color);
-            margin-top: 15px;
-            display: none;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: rgba(231, 111, 81, 0.1);
-            border-left: 4px solid var(--error-color);
-        }
-
-        .section {
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title::before {
-            margin-right: 8px;
-            font-size: 1.2em;
-        }
-
-        .characters-section .section-title::before {
-            content: "🍵";
-        }
-
-        .plot-section .section-title::before {
-            content: "🌿";
-        }
-
-        .settings-section .section-title::before {
-            content: "🍃";
-        }
-
-        .model-section .section-title::before {
-            content: "🤖";
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.9rem;
-            color: #777;
-        }
-
-        .info-tooltip {
-            display: inline-block;
-            margin-left: 5px;
-            position: relative;
-            color: var(--secondary-color);
+            border-radius: 5px;
             cursor: pointer;
         }
 
-        .tooltip-text {
-            visibility: hidden;
-            width: 200px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.8rem;
-            font-weight: normal;
-        }
-
-        .info-tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .model-badge {
-            background-color: rgba(74, 124, 89, 0.1);
-            border-radius: 6px;
-            padding: 8px 12px;
-            display: inline-flex;
-            align-items: center;
-            margin-top: 8px;
-        }
-
-        .model-badge img {
-            height: 24px;
-            margin-right: 8px;
-        }
     </style>
 </head>
 <body>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
     <div class="container">
-        <div class="leaf-decoration leaf-top-right">🍃</div>
-        <div class="leaf-decoration leaf-bottom-left">🌿</div>
+        <h1>3D Audio Rotator</h1>
 
-        <h1>🍵 Leaf Tales</h1>
-        <p style="text-align: center; margin-bottom: 30px; color: #666;">Brew your own custom stories with our AI story generator</p>
-
-        <div class="section characters-section">
-            <div class="section-title">Characters</div>
-
-            <div id="charactersContainer">
-                <div class="character-container" id="character1">
-                    <h3>Character 1</h3>
-                    <label for="characterName1">Character Name:</label>
-                    <input type="text" id="characterName1" placeholder="e.g., Sarah Johnson">
-
-                    <label for="characterDescription1">Character Description:</label>
-                    <textarea id="characterDescription1" placeholder="Describe the character's appearance, personality, background, etc."></textarea>
-                </div>
-            </div>
-
-            <button class="add-character" id="addCharacterBtn">+ Add Another Character</button>
+        <div class="control-group">
+            <label for="fileInput">Select Audio File</label>
+            <input type="file" id="fileInput" accept="audio/*">
         </div>
 
-        <div class="section plot-section">
-            <div class="section-title">Story Details</div>
-
-            <label for="plotIdea">Story Plot/Premise:</label>
-            <textarea id="plotIdea" placeholder="Describe the main storyline or scenario for your story"></textarea>
-
-            <label for="setting">Setting:</label>
-            <input type="text" id="setting" placeholder="e.g., Medieval fantasy kingdom, modern-day New York, space station, etc.">
-
-            <label for="genre">Genre:</label>
-            <select id="genre">
-                <option value="fantasy">Fantasy</option>
-                <option value="science fiction">Science Fiction</option>
-                <option value="romance">Romance</option>
-                <option value="mystery">Mystery/Thriller</option>
-                <option value="horror">Horror</option>
-                <option value="adventure">Adventure</option>
-                <option value="historical">Historical Fiction</option>
-                <option value="comedy">Comedy</option>
-                <option value="drama">Drama</option>
+        <div class="control-group">
+            <label for="rotationSpeed">Rotation Speed (0.01 - 0.1)</label>
+            <input type="range" id="rotationSpeed" min="0.01" max="0.1" step="0.01" value="0.02">
+        </div>
+        <div class="control-group">
+            <label for="patternSelect">Select Movement Pattern</label>
+            <select id="patternSelect">
+                <option value="circle">Circle</option>
+                <option value="figure8">Figure-8</option>
+                <option value="spiral">Spiral</option>
+                <option value="line">Line</option>
+                <option value="sine">Sine</option>
+                <option value="ellipse">Ellipse</option>
+                <option value="lemniscate">Lemniscate</option>
+                <option value="zigzag">Zigzag</option>
+                <option value="wave">Wave</option>
+                <option value="custom">Custom</option>
             </select>
         </div>
 
-        <div class="section settings-section">
-            <div class="section-title">Generation Settings</div>
+        <div class="control-group">
+            <label for="customX">Custom X Position Offset</label>
+            <input type="range" id="customX" min="-1" max="1" step="0.1" value="0">
+        </div>
 
-            <label for="storyLength">Story Length:</label>
-            <select id="storyLength">
-                <option value="short">Short (Few paragraphs)</option>
-                <option value="medium" selected>Medium (Short story)</option>
-                <option value="long">Long (Extended narrative)</option>
-            </select>
+        <div class="control-group">
+            <label for="customY">Custom Y Position Offset</label>
+            <input type="range" id="customY" min="-1" max="1" step="0.1" value="0">
+        </div>
 
-            <div style="margin-top: 20px;">
-                <label>Selected Model:</label>
-                <div class="model-badge">
-                    <span>🧠 DeepSeek R1 Free</span>
-                    <span class="info-tooltip" style="margin-left: 8px;">ⓘ
-                        <span class="tooltip-text">DeepSeek R1 is a powerful and creative model for generating engaging stories.</span>
-                    </span>
+        <div class="control-group">
+            <label for="customZ">Custom Z Position Offset</label>
+            <input type="range" id="customZ" min="-1" max="1" step="0.1" value="0">
+        </div>
+        <div class="btn-group">
+            <button id="playBtn" class="btn">Play</button>
+            <button id="pauseBtn" class="btn">Pause</button>
+        </div>
+
+        <div id="customControls">
+            <p id="instructions">When in Custom mode, draw a path on the canvas below. The audio will follow this path. Use the height canvas to control the vertical position.</p>
+             <div class="canvas-container">
+                <div id="customCanvasWrap">
+                    <canvas id="customCanvas" width="200" height="200"></canvas>
                 </div>
-                <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">DeepSeek R1 is a high-quality model capable of generating creative and coherent stories.</p>
+                <div id="heightCanvasWrap">
+                    <canvas id="heightCanvas" width="200" height="200"></canvas>
+                </div>
             </div>
+            <button id="clearCanvas" class="btn">Clear Drawing</button>
+
         </div>
-
-        <button id="generateBtn">🪄 Generate Story</button>
-
-        <div class="loading" id="loadingIndicator">
-            <div class="spinner"></div>
-            <p>Brewing your custom story... Please wait.</p>
-        </div>
-
-        <div class="error" id="errorMessage"></div>
-
-        <div class="result" id="storyResult"></div>
     </div>
-
-    <footer>
-        <p>Using DeepSeek R1 Free via OpenRouter API. Need help? Check out the <a href="https://openrouter.ai/docs" target="_blank" style="color: var(--primary-color);">OpenRouter documentation</a>.</p>
-    </footer>
+    <!-- Visualizer Canvas -->
+    <div id="visualizerCanvasWrap">
+        <canvas id="visualizerCanvas"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/capabilities/WebGL.js"></script>
 
     <script>
-        // Store your API key here - in production, this should be handled more securely
-        const API_KEY = "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";
-        const MODEL = "deepseek/deepseek-r1:free";
+       // --- Three.js Setup ---
+        let scene, camera, renderer, soundSource;
+        let isThreeInitialized = false; // Flag to track initialization
 
-        // Define a default site URL and site name
-        const SITE_URL = "https://atree2025.github.io/";
-        const SITE_NAME = "Leaf Tales Story Generator";
+        function initThreeJS() {
+            if (isThreeInitialized) return; // Prevent multiple initializations
 
-        let characterCount = 1;
+            // Scene
+            scene = new THREE.Scene();
 
-        document.getElementById('addCharacterBtn').addEventListener('click', function() {
-            characterCount++;
+            // Get the actual dimensions of the visualizer canvas
+            const visualizerCanvas = document.getElementById('visualizerCanvas');
+            const canvasWidth = visualizerCanvas.clientWidth;  // Use clientWidth
+            const canvasHeight = visualizerCanvas.clientHeight; // Use clientHeight
 
-            const newCharacter = document.createElement('div');
-            newCharacter.className = 'character-container';
-            newCharacter.id = 'character' + characterCount;
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, canvasWidth / canvasHeight, 0.1, 1000); // Use dynamic ratio
+            camera.position.set(0, 3, 5);
+            camera.lookAt(0, 0, 0);
 
-            newCharacter.innerHTML = `
-                <h3>Character ${characterCount}</h3>
-                <label for="characterName${characterCount}">Character Name:</label>
-                <input type="text" id="characterName${characterCount}" placeholder="e.g., John Smith">
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: visualizerCanvas, antialias: true });
+            renderer.setSize(canvasWidth, canvasHeight); // Set size dynamically
+            renderer.setClearColor(0xeeeeee);
 
-                <label for="characterDescription${characterCount}">Character Description:</label>
-                <textarea id="characterDescription${characterCount}" placeholder="Describe the character's appearance, personality, background, etc."></textarea>
-            `;
+            // Room
+            const roomGeometry = new THREE.BoxGeometry(6, 4, 6);
+            const roomMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc, wireframe: true });
+            const room = new THREE.Mesh(roomGeometry, roomMaterial);
+            scene.add(room);
 
-            document.getElementById('charactersContainer').appendChild(newCharacter);
-        });
+            // Sound Source
+            const sourceGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+            const sourceMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            soundSource = new THREE.Mesh(sourceGeometry, sourceMaterial);
+            scene.add(soundSource);
 
-        document.getElementById('generateBtn').addEventListener('click', async function() {
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const errorMessage = document.getElementById('errorMessage');
-            const storyResult = document.getElementById('storyResult');
+            // Render once to initialize
+            renderer.render(scene, camera);
+            isThreeInitialized = true; // Set the flag
 
-            loadingIndicator.style.display = 'block';
-            errorMessage.style.display = 'none';
-            storyResult.style.display = 'none';
+            // Handle window resize for Three.js
+            window.addEventListener('resize', onWindowResize, false);
 
-            try {
-                // Gather character information
-                const characters = [];
-                for (let i = 1; i <= characterCount; i++) {
-                    const name = document.getElementById(`characterName${i}`).value;
-                    const description = document.getElementById(`characterDescription${i}`).value;
+            function onWindowResize() {
+                const newWidth = visualizerCanvas.clientWidth;
+                const newHeight = visualizerCanvas.clientHeight;
 
-                    if (name && description) {
-                        characters.push({ name, description });
-                    }
-                }
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newWidth, newHeight);
+            }
+        }
 
-                const plotIdea = document.getElementById('plotIdea').value;
-                const setting = document.getElementById('setting').value;
-                const genre = document.getElementById('genre').value;
-                const storyLength = document.getElementById('storyLength').value;
+      // --- UI elements ---
+        const fileInput = document.getElementById('fileInput');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const rotationSpeedControl = document.getElementById('rotationSpeed');
+        const customXControl = document.getElementById('customX');
+        const customYControl = document.getElementById('customY');
+        const customZControl = document.getElementById('customZ');
+        const patternSelect = document.getElementById('patternSelect');
+        const customCanvas = document.getElementById('customCanvas');
+        const heightCanvas = document.getElementById('heightCanvas');
+        const clearCanvasBtn = document.getElementById('clearCanvas');
+        const customControls = document.getElementById('customControls');
+        const darkModeToggle = document.getElementById('darkModeToggle');
 
-                if (characters.length === 0 || !plotIdea) {
-                    throw new Error("Please provide at least one character and a plot idea");
-                }
 
-                // Construct the prompt for the AI
-                let prompt = `Write a ${genre} story with the following characters:\n\n`;
 
-                characters.forEach(char => {
-                    prompt += `Character: ${char.name}\n`;
-                    prompt += `Description: ${char.description}\n\n`;
-                });
+        // --- Audio setup ---
+        let audioCtx, source, panner, animationFrame;
+        let angle = 0;
+        let paused = false;
 
-                prompt += `Plot/Premise: ${plotIdea}\n`;
-                prompt += `Setting: ${setting}\n`;
-                prompt += `Genre: ${genre}\n`;
+        // --- Custom drawing variables ---
+        let drawing = false, customPath = [], heightPath = [];
+        const ctx = customCanvas.getContext('2d');
+        const heightCtx = heightCanvas.getContext('2d');
 
-                let maxTokens;
-                switch (storyLength) {
-                    case 'short':
-                        maxTokens = 500;
-                        prompt += "Write a short story of a few paragraphs.";
-                        break;
-                    case 'medium':
-                        maxTokens = 1000;
-                        prompt += "Write a medium-length short story.";
-                        break;
-                    case 'long':
-                        maxTokens = 2000;
-                        prompt += "Write a longer narrative with more detail and development.";
-                        break;
-                }
 
-                if (!API_KEY) {
-                    throw new Error("API key is missing. Please set your OpenRouter API key in the script.");
-                }
-
-                console.log("Sending request to OpenRouter API...");
-
-                // Call the API with proper OpenRouter headers
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`,
-                        'HTTP-Referer': SITE_URL,
-                        'X-Title': SITE_NAME
-                    },
-                    body: JSON.stringify({
-                        model: MODEL,
-                        messages: [
-                            {
-                                role: "user",
-                                content: prompt
-                            }
-                        ],
-                        max_tokens: maxTokens
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("API Error:", errorData);
-                    throw new Error(errorData.error?.message || `Error: ${response.status} ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                console.log("API Response:", data);
-
-                // Display the generated story
-                const generatedStory = data.choices[0].message.content;
-                storyResult.textContent = generatedStory;
-                storyResult.style.display = 'block';
-            } catch (error) {
-                console.error("Error:", error);
-                errorMessage.textContent = error.message || "An error occurred while generating your story.";
-                errorMessage.style.display = 'block';
-            } finally {
-                loadingIndicator.style.display = 'none';
+        // Show/hide canvas based on pattern selection
+        patternSelect.addEventListener('change', () => {
+            if (patternSelect.value === 'custom') {
+                customCanvas.style.display = 'block';
+                heightCanvas.style.display = 'block';
+            } else {
+                customCanvas.style.display = 'none';
+                heightCanvas.style.display = 'none';
             }
         });
+
+// --- Canvas Drawing Functions (with helper lines) ---
+
+function startDrawing(e, canvas, path, context) {
+    drawing = true;
+    path.length = 0;
+    const pos = getMousePos(e, canvas);
+    path.push(pos);
+    drawCanvas(canvas, path, context);
+}
+
+function continueDrawing(e, canvas, path, context) {
+    if (!drawing) return;
+    const pos = getMousePos(e, canvas);
+    path.push(pos);
+    drawCanvas(canvas, path, context);
+}
+
+function stopDrawing() {
+    drawing = false;
+}
+
+function getMousePos(e, canvas) {
+    const rect = canvas.getBoundingClientRect();
+     return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
+}
+
+function catmullRom(p0, p1, p2, p3, t) {
+    const v0 = (p2 - p0) * 0.5;
+    const v1 = (p3 - p1) * 0.5;
+    const t2 = t * t;
+    const t3 = t * t2;
+    return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
+}
+
+function drawCanvas(canvas, path, context) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw helper lines (center cross)
+    context.strokeStyle = 'var(--helper-line-color)';
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(canvas.width / 2, 0);
+    context.lineTo(canvas.width / 2, canvas.height);
+    context.moveTo(0, canvas.height / 2);
+    context.lineTo(canvas.width, canvas.height / 2);
+    context.stroke();
+
+
+    if (path.length < 2) return;
+
+    context.beginPath();
+    context.moveTo(path[0].x, path[0].y);
+
+    for (let i = 0; i < path.length - 1; i++) {
+        const p0 = i > 0 ? path[i - 1] : path[i];
+        const p1 = path[i];
+        const p2 = path[i + 1];
+        const p3 = i < path.length - 2 ? path[i + 2] : p2;
+
+        for (let t = 0; t <= 1; t += 0.1) {
+            const x = catmullRom(p0.x, p1.x, p2.x, p3.x, t);
+            const y = catmullRom(p0.y, p1.y, p2.y, p3.y, t);
+            context.lineTo(x, y);
+        }
+    }
+
+    context.strokeStyle = "#007BFF";
+    context.lineWidth = 3;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.stroke();
+}
+
+        // Event listeners for customCanvas
+        customCanvas.addEventListener('mousedown', (e) => startDrawing(e, customCanvas, customPath, ctx));
+        customCanvas.addEventListener('mousemove', (e) => continueDrawing(e, customCanvas, customPath, ctx));
+        customCanvas.addEventListener('mouseup', stopDrawing);
+        customCanvas.addEventListener('mouseleave', stopDrawing);
+
+        // Event listeners for heightCanvas
+        heightCanvas.addEventListener('mousedown', (e) => startDrawing(e, heightCanvas, heightPath, heightCtx));
+        heightCanvas.addEventListener('mousemove', (e) => continueDrawing(e, heightCanvas, heightPath, heightCtx));
+        heightCanvas.addEventListener('mouseup', stopDrawing);
+        heightCanvas.addEventListener('mouseleave', stopDrawing);
+
+
+
+        clearCanvasBtn.addEventListener('click', () => {
+            customPath = [];
+            heightPath = [];
+            ctx.clearRect(0, 0, customCanvas.width, customCanvas.height);
+            heightCtx.clearRect(0, 0, heightCanvas.width, heightCanvas.height);
+        });
+
+        // --- Three.js Render Loop ---
+        let renderAnimation;  // Declare outside to manage it correctly
+        function renderThree() {
+            renderer.render(scene, camera);
+            renderAnimation = requestAnimationFrame(renderThree);
+        }
+
+
+    // --- Audio Playback and Animation ---
+    playBtn.addEventListener('click', () => {
+        if (!fileInput.files[0]) {
+            alert('Please upload an audio file first.');
+            return;
+        }
+
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        initThreeJS(); // Initialize Three.js (only if not already done)
+
+        // The rest of your audio setup remains the same
+        panner = audioCtx.createPanner();
+        panner.panningModel = 'HRTF';
+        panner.distanceModel = 'inverse';
+        panner.refDistance = 1;
+        panner.maxDistance = 10000;
+        panner.rolloffFactor = 1;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            audioCtx.decodeAudioData(e.target.result, (buffer) => {
+                if (source) {
+                    source.disconnect();
+                    cancelAnimationFrame(animationFrame);
+                    //  cancelAnimationFrame(renderAnimation); //CANCEL PREVIOUS ONE
+                }
+                source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+                source.loop = true;
+                source.connect(panner);
+                panner.connect(audioCtx.destination);
+                source.start(0);
+                angle = 0;
+                paused = false;
+                pauseBtn.textContent = 'Pause';
+
+                rotateSound(); // Start audio animation
+                if (!renderAnimation) { // Only start if not already running
+                    renderThree();     // Start Three.js animation
+                }
+
+            });
+        };
+        reader.readAsArrayBuffer(fileInput.files[0]);
+    });
+
+    pauseBtn.addEventListener('click', () => {
+    if (!source) return;
+
+    if (!paused) {
+        audioCtx.suspend();
+        cancelAnimationFrame(animationFrame);
+        cancelAnimationFrame(renderAnimation); // Stop Three.js rendering
+        paused = true;
+        pauseBtn.textContent = 'Resume';
+    } else {
+        audioCtx.resume();
+        paused = false;
+        pauseBtn.textContent = 'Pause';
+        rotateSound(); // Restart audio animation
+        if (!renderAnimation) {
+             renderThree();
+        }
+    }
+});
+
+    function rotateSound() {
+        if (paused) return;
+
+        const speed = parseFloat(rotationSpeedControl.value);
+        const offsetX = parseFloat(customXControl.value);
+        const offsetY = parseFloat(customYControl.value);
+        const offsetZ = parseFloat(customZControl.value);
+        angle += speed;
+
+        let pos = { x: 0, y: 0, z: 0 };
+
+        switch (patternSelect.value) {
+            case 'circle':
+                pos.x = Math.cos(angle);
+                pos.y = 0;
+                pos.z = Math.sin(angle);
+                break;
+            case 'figure8':
+                pos.x = Math.cos(angle);
+                pos.y = Math.sin(angle) * 0.5;
+                pos.z = Math.sin(2 * angle) / 2;
+                break;
+            case 'spiral':
+                const r = angle / 10;
+                pos.x = r * Math.cos(angle);
+                pos.y = r * 0.2;
+                pos.z = r * Math.sin(angle);
+                break;
+            case 'line':
+                pos.x = ((angle % (2 * Math.PI)) / Math.PI) - 1;
+                pos.y = 0;
+                pos.z = 0;
+                break;
+            case 'sine':
+                pos.x = (angle % (2 * Math.PI)) / Math.PI - 1;
+                pos.y = 0;
+                pos.z = Math.sin(angle);
+                break;
+            case 'ellipse':
+                pos.x = 1.5 * Math.cos(angle);
+                pos.y = 0.5 * Math.sin(angle * 2);
+                pos.z = Math.sin(angle);
+                break;
+            case 'lemniscate':
+                const denom = 1 + Math.sin(angle) * Math.sin(angle);
+                pos.x = Math.cos(angle) / denom;
+                pos.y = Math.sin(angle * 2) / denom;
+                pos.z = (Math.cos(angle) * Math.sin(angle)) / denom;
+                break;
+            case 'zigzag':
+                const period = 2 * Math.PI;
+                const t = angle % period;
+                pos.x = t < period / 2 ? 1 : -1;
+                pos.y = Math.sin(angle * 3) * 0.5;
+                pos.z = Math.sin(angle);
+                break;
+            case 'wave':
+                pos.x = Math.cos(angle);
+                pos.y = Math.sin(angle * 3) * 0.3;
+                pos.z = Math.sin(angle * 2);
+                break;
+            case 'custom':
+                pos = getCustomPosition((angle % (2 * Math.PI)) / (2 * Math.PI));
+                break;
+            default:
+                pos.x = Math.cos(angle);
+                pos.y = 0;
+                pos.z = Math.sin(angle);
+        }
+
+        // Apply user-defined offsets
+        pos.x += offsetX;
+        pos.y += offsetY;
+        pos.z += offsetZ;
+
+        // --- Update Three.js Object Position ---
+        soundSource.position.set(pos.x, pos.y, pos.z);
+
+        panner.setPosition(pos.x, pos.y, pos.z);
+        animationFrame = requestAnimationFrame(rotateSound);
+
+    }
+    function getCustomPosition(t) {
+    if (customPath.length < 2) return { x: 0, y: 0, z: 0 };
+
+    // 1. Calculate total length of the main path (customPath)
+    let customLengths = [];
+    let customTotal = 0;
+    for (let i = 1; i < customPath.length; i++) {
+        const dx = customPath[i].x - customPath[i - 1].x;
+        const dy = customPath[i].y - customPath[i - 1].y;
+        const seg = Math.hypot(dx, dy);
+        customLengths.push(seg);
+        customTotal += seg;
+    }
+
+    // 2. Find the segment on the main path that corresponds to 't'
+    let customTarget = t * customTotal;
+    let customAccumulated = 0;
+    for (let i = 0; i < customLengths.length; i++) {
+        if (customAccumulated + customLengths[i] >= customTarget) {
+            const ratio = (customTarget - customAccumulated) / customLengths[i];
+            const start = customPath[i];
+            const end = customPath[i + 1];
+
+            // 3. Interpolate X and Z based on the segment
+            const x = start.x + (end.x - start.x) * ratio;
+            const z = start.y + (end.y - start.y) * ratio;  // Use 'z' for the y-coordinate
+
+            // Normalize X and Z to [-1, 1]
+            const normX = (x / customCanvas.width - 0.5) * 2;
+            const normZ = -(z / customCanvas.height - 0.5) * 2; // Invert Z
+
+            // 4. Interpolate Y based on the heightPath, using the *same* 't'
+            let y = 0; // Default Y value
+             if (heightPath.length >= 2) {
+                let heightLengths = [];
+                let heightTotalLength = 0;
+                for (let j = 1; j < heightPath.length; j++) {
+                    let dx = heightPath[j].x - heightPath[j-1].x;
+                    let dy = heightPath[j].y - heightPath[j-1].y;
+                    let length = Math.sqrt(dx * dx + dy * dy);
+                    heightLengths.push(length);
+                    heightTotalLength += length;
+                }
+
+                let heightTargetDist = t * heightTotalLength;
+                let heightAccumulatedDist = 0;
+
+                for(let j=0; j< heightLengths.length; j++) {
+                  if(heightAccumulatedDist + heightLengths[j] >= heightTargetDist) {
+                    let ratio = (heightTargetDist - heightAccumulatedDist) / heightLengths[j];
+                      const startH = heightPath[j];
+                      const endH = heightPath[j + 1];
+                      const heightY = startH.y + (endH.y - startH.y) * ratio;
+                      y = -(heightY / heightCanvas.height - 0.5) * 2;  //Normalize and invert.
+                    break;
+                  }
+                  heightAccumulatedDist += heightLengths[j];
+                }
+            }
+            return { x: normX, y: y, z: normZ };
+        }
+        customAccumulated += customLengths[i];
+    }
+    return { x: 0, y: 0, z: 0 };
+}
+
+// Dark Mode Toggle Logic
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+     // Update Three.js clear color
+    if (renderer) {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        renderer.setClearColor(isDarkMode ? 0x1e1e1e : 0xeeeeee);
+    }
+});
+
     </script>
 </body>
 </html>
