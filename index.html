@@ -47,35 +47,35 @@
             background-color: var(--control-bg);
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 80%;
+            padding: 20px; /* Reduced padding for mobile */
+            width: 95%; /* Wider on mobile */
             max-width: 800px;
-            margin-bottom: 20px; /* Space between controls and visualizer */
+            margin-bottom: 20px;
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 30px;
-            color: var(--text-color); /* Use variable */
+            margin-bottom: 20px; /* Reduced margin */
+            color: var(--text-color);
         }
 
         .control-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px; /* Reduced margin */
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            color: var(--text-color); /* Use variable */
+            margin-bottom: 6px; /* Reduced margin */
+            color: var(--text-color);
             font-weight: 600;
         }
 
-        input[type="file"],
+      input[type="file"],
         input[type="range"],
         select,
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 10px; /* Reduced padding */
             border: 1px solid var(--control-border);
             border-radius: 6px;
             font-size: 16px;
@@ -97,13 +97,12 @@
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 18px; /* Slightly smaller thumb */
+            height: 18px;
             border-radius: 50%;
             background: var(--btn-bg);
             cursor: pointer;
         }
-
         input[type="file"]:focus,
         input[type="range"]:focus,
         select:focus,
@@ -111,7 +110,6 @@
             border-color: var(--control-focus);
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
         }
-
         .btn-group {
             display: flex;
             gap: 10px;
@@ -124,6 +122,7 @@
             cursor: pointer;
             font-weight: 500;
             flex: 1;
+             padding: 10px 15px; /* Consistent padding with inputs */
         }
 
         .btn:hover {
@@ -137,19 +136,19 @@
             display: none;
             margin-top: 10px;
             touch-action: none;
-            width: 200px; /* Square dimensions */
-            height: 200px;
+            width: 100%;  /* Full width on mobile */
+            height: 200px; /* Keep height consistent */
             box-sizing: border-box;
         }
 
-        #customCanvasWrap,
+       #customCanvasWrap,
         #heightCanvasWrap {
-           display: inline-block; /* Key change for side-by-side layout */
+            display: block; /* Stack canvases vertically on mobile */
             position: relative;
-            width: 200px; /* Match canvas */
-            height: 200px;
+            width: 100%;  /* Full width */
+            height: 200px;  /* Consistent Height */
             margin-top: 10px;
-            margin-right: 10px; /* Add some spacing between canvases */
+            margin-right: 0; /* Remove right margin */
         }
 
         #instructions {
@@ -161,43 +160,58 @@
 
         #customControls {
             margin-top: 20px;
-            text-align: center; /* Center the content */
+            text-align: center;
         }
-        .canvas-container {
-           display: flex; /* Use flexbox for horizontal layout */
-           justify-content: center; /* Center canvases horizontally */
-            width: 100%;
-            margin-bottom: 10px; /* Add margin below the canvases */
-         }
 
-         /* Style for the visualizer canvas */
-         #visualizerCanvas {
-            width: 100%;  /* Full Width */
-            max-width: 800px; /* But not exceeding the container */
-            aspect-ratio: 2 / 1; /* Maintain 2:1 aspect ratio */
+        .canvas-container {
+            display: flex;
+            flex-direction: column; /* Stack canvases vertically */
+            align-items: center;  /* Center them horizontally */
+            width: 100%;
+            margin-bottom: 10px;
+
+        }
+        /* Visualizer canvas */
+        #visualizerCanvas {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 2 / 1;
             border: 1px solid var(--canvas-border);
             background-color: var(--canvas-bg);
             box-sizing: border-box;
         }
+
         #visualizerCanvasWrap {
             display: flex;
             justify-content: center;
-            width: 100%
-        }
-        /* Dark Mode Toggle */
-        #darkModeToggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            /* Style the toggle (you can use a more fancy toggle if you like) */
-            padding: 5px 10px;
-            background-color: var(--btn-bg);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            width: 100%;
         }
 
+        /* Dark Mode Toggle */
+        #darkModeToggle {
+           position: absolute; /*Keep in container*/
+           top: 10px;         /*Keep in container*/
+           right: 10px;       /*Keep in container*/
+           padding: 5px 10px;
+           background-color: var(--btn-bg);
+           color: white;
+           border: none;
+           border-radius: 5px;
+           cursor: pointer;
+       }
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+              #customCanvasWrap,
+            #heightCanvasWrap {
+                width: 100%; /* Full width on smaller screens */
+            }
+            .canvas-container {
+                flex-direction: column; /* Stack canvases on small screens */
+            }
+        }
     </style>
 </head>
 <body>
@@ -384,12 +398,22 @@ function continueDrawing(e, canvas, path, context) {
 function stopDrawing() {
     drawing = false;
 }
-
+//Use pageX and pageY for touch
 function getMousePos(e, canvas) {
     const rect = canvas.getBoundingClientRect();
-     return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+    let clientX, clientY;
+
+    if (e.touches) { // Touch event
+        clientX = e.touches[0].pageX;
+        clientY = e.touches[0].pageY;
+    } else { // Mouse event
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
     };
 }
 
@@ -441,18 +465,25 @@ function drawCanvas(canvas, path, context) {
 }
 
         // Event listeners for customCanvas
-        customCanvas.addEventListener('mousedown', (e) => startDrawing(e, customCanvas, customPath, ctx));
-        customCanvas.addEventListener('mousemove', (e) => continueDrawing(e, customCanvas, customPath, ctx));
-        customCanvas.addEventListener('mouseup', stopDrawing);
-        customCanvas.addEventListener('mouseleave', stopDrawing);
-
-        // Event listeners for heightCanvas
-        heightCanvas.addEventListener('mousedown', (e) => startDrawing(e, heightCanvas, heightPath, heightCtx));
-        heightCanvas.addEventListener('mousemove', (e) => continueDrawing(e, heightCanvas, heightPath, heightCtx));
-        heightCanvas.addEventListener('mouseup', stopDrawing);
-        heightCanvas.addEventListener('mouseleave', stopDrawing);
+    customCanvas.addEventListener('mousedown', (e) => startDrawing(e, customCanvas, customPath, ctx));
+    customCanvas.addEventListener('mousemove', (e) => continueDrawing(e, customCanvas, customPath, ctx));
+    customCanvas.addEventListener('mouseup', stopDrawing);
+    customCanvas.addEventListener('mouseleave', stopDrawing);
+    //Add touch events
+    customCanvas.addEventListener('touchstart', (e) => startDrawing(e, customCanvas, customPath, ctx));
+    customCanvas.addEventListener('touchmove', (e) => continueDrawing(e, customCanvas, customPath, ctx));
+    customCanvas.addEventListener('touchend', stopDrawing);
 
 
+    // Event listeners for heightCanvas
+    heightCanvas.addEventListener('mousedown', (e) => startDrawing(e, heightCanvas, heightPath, heightCtx));
+    heightCanvas.addEventListener('mousemove', (e) => continueDrawing(e, heightCanvas, heightPath, heightCtx));
+    heightCanvas.addEventListener('mouseup', stopDrawing);
+    heightCanvas.addEventListener('mouseleave', stopDrawing);
+    //Add touch events.
+    heightCanvas.addEventListener('touchstart', (e) => startDrawing(e, heightCanvas, heightPath, heightCtx));
+    heightCanvas.addEventListener('touchmove', (e) => continueDrawing(e, heightCanvas, heightPath, heightCtx));
+    heightCanvas.addEventListener('touchend', stopDrawing);
 
         clearCanvasBtn.addEventListener('click', () => {
             customPath = [];
