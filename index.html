@@ -389,25 +389,29 @@ function continueDrawing(e, canvas, path, context) {
 }
 
 function stopDrawing(e) {
-    drawing = false; // Removed preventDefault() from here
+     if (e.touches) {
+        e.preventDefault();
+    }
+    drawing = false;
 }
 
-//Use pageX and pageY for touch
+// *** CRUCIAL FIX: getMousePos now correctly accounts for canvas offset ***
 function getMousePos(e, canvas) {
     const rect = canvas.getBoundingClientRect();
     let clientX, clientY;
 
     if (e.touches) { // Touch event
-        clientX = e.touches[0].pageX;
-        clientY = e.touches[0].pageY;
+        // Use getBoundingClientRect() to get CORRECT canvas offset
+        clientX = e.touches[0].clientX - rect.left;
+        clientY = e.touches[0].clientY - rect.top;
     } else { // Mouse event
-        clientX = e.clientX;
-        clientY = e.clientY;
+        clientX = e.clientX - rect.left;
+        clientY = e.clientY - rect.top;
     }
 
     return {
-        x: clientX - rect.left,
-        y: clientY - rect.top
+        x: clientX,  // No longer need to subtract rect.left/top
+        y: clientY   // No longer need to subtract rect.left/top
     };
 }
 
@@ -458,26 +462,26 @@ function drawCanvas(canvas, path, context) {
     context.stroke();
 }
 
-        // Event listeners for customCanvas
-    customCanvas.addEventListener('mousedown', (e) => startDrawing(e, customCanvas, customPath, ctx));
-    customCanvas.addEventListener('mousemove', (e) => continueDrawing(e, customCanvas, customPath, ctx));
-    customCanvas.addEventListener('mouseup', stopDrawing);
-    customCanvas.addEventListener('mouseleave', stopDrawing);
-   //Add touch events with passive: false
-    customCanvas.addEventListener('touchstart', (e) => startDrawing(e, customCanvas, customPath, ctx), { passive: false });
-    customCanvas.addEventListener('touchmove', (e) => continueDrawing(e, customCanvas, customPath, ctx), { passive: false });
-    customCanvas.addEventListener('touchend', stopDrawing, { passive: false });
+// Event listeners for customCanvas
+customCanvas.addEventListener('mousedown', (e) => startDrawing(e, customCanvas, customPath, ctx));
+customCanvas.addEventListener('mousemove', (e) => continueDrawing(e, customCanvas, customPath, ctx));
+customCanvas.addEventListener('mouseup', stopDrawing);
+customCanvas.addEventListener('mouseleave', stopDrawing);
+//Add touch events with passive: false
+customCanvas.addEventListener('touchstart', (e) => startDrawing(e, customCanvas, customPath, ctx), { passive: false });
+customCanvas.addEventListener('touchmove', (e) => continueDrawing(e, customCanvas, customPath, ctx), { passive: false });
+customCanvas.addEventListener('touchend', stopDrawing, { passive: false });
 
 
-    // Event listeners for heightCanvas
-    heightCanvas.addEventListener('mousedown', (e) => startDrawing(e, heightCanvas, heightPath, heightCtx));
-    heightCanvas.addEventListener('mousemove', (e) => continueDrawing(e, heightCanvas, heightPath, heightCtx));
-    heightCanvas.addEventListener('mouseup', stopDrawing);
-    heightCanvas.addEventListener('mouseleave', stopDrawing);
-    //Add touch events with passive: false
-    heightCanvas.addEventListener('touchstart', (e) => startDrawing(e, heightCanvas, heightPath, heightCtx), { passive: false });
-    heightCanvas.addEventListener('touchmove', (e) => continueDrawing(e, heightCanvas, heightPath, heightCtx), { passive: false });
-    heightCanvas.addEventListener('touchend', stopDrawing, { passive: false });
+// Event listeners for heightCanvas
+heightCanvas.addEventListener('mousedown', (e) => startDrawing(e, heightCanvas, heightPath, heightCtx));
+heightCanvas.addEventListener('mousemove', (e) => continueDrawing(e, heightCanvas, heightPath, heightCtx));
+heightCanvas.addEventListener('mouseup', stopDrawing);
+heightCanvas.addEventListener('mouseleave', stopDrawing);
+//Add touch events with passive: false
+heightCanvas.addEventListener('touchstart', (e) => startDrawing(e, heightCanvas, heightPath, heightCtx), { passive: false });
+heightCanvas.addEventListener('touchmove', (e) => continueDrawing(e, heightCanvas, heightPath, heightCtx), { passive: false });
+heightCanvas.addEventListener('touchend', stopDrawing, { passive: false });
 
         clearCanvasBtn.addEventListener('click', () => {
             customPath = [];
