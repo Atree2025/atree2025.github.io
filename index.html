@@ -135,7 +135,7 @@
             background-color: var(--canvas-bg);
             display: none;
             margin-top: 10px;
-            touch-action: none;
+            /* touch-action: none; REMOVE THIS */
             width: 100%;  /* Full width on mobile */
             height: 200px; /* Keep height consistent */
             box-sizing: border-box;
@@ -379,8 +379,11 @@
         });
 
 // --- Canvas Drawing Functions (with helper lines) ---
-
+// Add preventDefault to touch events *only when drawing*
 function startDrawing(e, canvas, path, context) {
+    if (e.touches) {
+        e.preventDefault(); // Prevent scrolling when drawing starts
+    }
     drawing = true;
     path.length = 0;
     const pos = getMousePos(e, canvas);
@@ -390,14 +393,21 @@ function startDrawing(e, canvas, path, context) {
 
 function continueDrawing(e, canvas, path, context) {
     if (!drawing) return;
+    if (e.touches) {
+        e.preventDefault(); // Prevent page zoom/pan during drawing
+    }
     const pos = getMousePos(e, canvas);
     path.push(pos);
     drawCanvas(canvas, path, context);
 }
 
-function stopDrawing() {
+function stopDrawing(e) {
+     if (e.touches) {
+        e.preventDefault();
+    }
     drawing = false;
 }
+
 //Use pageX and pageY for touch
 function getMousePos(e, canvas) {
     const rect = canvas.getBoundingClientRect();
